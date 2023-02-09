@@ -1,0 +1,14 @@
+.main {
+    width: 100wh;
+    height: 100vh;
+}
+
+.frontTable {
+    width: 99%;
+    height: 99%;
+    background-color: black;
+    position: absolute;
+    z-index: 2;
+    left: 0.5%;
+    top: 0.5%
+}
