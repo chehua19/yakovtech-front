@@ -4,11 +4,12 @@
 }
 
 .frontTable {
-    width: 99%;
-    height: 99%;
+    display: none;
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
     background-color: black;
     position: absolute;
     z-index: 2;
-    left: 0.5%;
-    top: 0.5%
+    left: 10px;
+    top: 10px;
 }
