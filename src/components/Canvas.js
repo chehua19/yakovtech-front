@@ -10,89 +10,59 @@ const Canvas = props => {
         //{ color: "#000", angle: 345}
       ];
     const delta = 100;
-    const toRadians = degree => {
-        return degree*Math.PI/180;
-    }
-
-    const toDegree = radian => {
-        return radian/(Math.PI/180);
-    }
     
     const draw = (ctx, frameCount) => {
+        let offsetProgress = 0;
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        let startAngle = 0;
-        let oldLines = null;
-        
+
         data.forEach((d) => {
-            let angle = startAngle === 0 ? (startAngle+frameCount)%360 : startAngle;
-            let cx = ctx.canvas.width/2;
-            let cy = ctx.canvas.height/2;
+            let progress = offsetProgress === 0 ? (frameCount*0.2)%100 : offsetProgress;
+            
             ctx.strokeStyle = d.color;
             ctx.fillStyle = d.color;
             
             //ctx.arc(cx, cy, 100, toRadians(angle), toRadians(angle+d.angle));
 
             ctx.beginPath();
-            ctx.moveTo(cx, cy);
-            
-            let coordinatesData = getCoordinates(ctx, angle);
-            let lines = coordinatesData.dotArr;
-            startAngle = coordinatesData.newAngle;
-            
-            if (oldLines == null) {
-                oldLines = lines[0];
-            }
-
-            ctx.lineTo(oldLines[0], oldLines[1]);
-            ctx.lineTo(lines[1][0], lines[1][1]);
-            
-            oldLines = lines[1];
-            
+            let data = getCoordinates(ctx, progress);
+            ctx.rect(data.x, data.y, delta, delta);
             ctx.fill();
+            offsetProgress = data.offset;
         });
        
     }
 
-    const getCoordinates = (ctx, degree) => {
+    const getCoordinates = (ctx, progress) => {
         let width = ctx.canvas.width;
         let height = ctx.canvas.height;
-        let x1, x2, y1, y2, newAngle;
-
-        if (degree > 315 || degree <= 45){
-            x1 = width;
-            y1 = (height/2) + (height/2) * Math.tan(toRadians(degree));
-            x2 = x1;
-            y2 = y1 + delta;
-            newAngle = toDegree(Math.atan2(height/2 ,y2));
+        let x, y, offset;
+        
+        if (progress <= 25){
+            x = (progress/25) * width;
+            y = 0;
+            offset = ((x-100) / width*25) % 100;
         } 
-        else if(degree > 45 && degree <= 135) {
-            x1 = (width/2) + (width/2) / Math.tan(toRadians(degree));
-            y1 = height;
-            x2 = x1 - delta;
-            y2 = y1;
-            newAngle = toDegree(Math.atan2((height/2) / (x2 + (height/2))));
+        else if(progress <= 50) {
+            x = width;
+            y = ((progress-25)/25) * height;
+            
         } 
-        else if(degree > 135 && degree <= 225) {
-            x1 = 0;
-            y1 = (height/2) - (height/2) * Math.tan(toRadians(degree));
-            x2 = x1;
-            y2 = y1 - delta;
-            newAngle = toDegree(Math.atan2((height/2) / (y2 + (height/2))));
+        else if(progress <= 75) {
+            x = width - (((progress-50)/25) * width);
+            y = height;           
+            offset = -(((x + 100) - width) / 25 * width) + 50
         } 
-        else if(degree > 225 && degree <= 315) {
-            x1 = (width/2) - (width/2) / Math.tan(toRadians(degree));
-            y1 = 0;
-            x2 = x1 + delta;
-            y2 = y1;
-            newAngle = toDegree(Math.atan2((width/2) / (x2 + (width/2))));
+        else if(progress <= 100) {
+            x = 0;
+            y = height - (((progress-75)/25) * height);
+            offset =  progress / 100;
         }      
         
         return {
-            dotArr: [[x1, y1], [x2, y2]],
-            newAngle:  newAngle
-        };
-
-        
+            x: x - delta/2,
+            y: y - delta/2,
+            offset:  offset
+        };        
     }
 
     useEffect(() => {
